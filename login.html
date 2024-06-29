@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인 페이지</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background: #eee !important;	
+        }
+
+        .wrapper {	
+            margin-top: 80px;
+            margin-bottom: 80px;
+        }
+
+        .form-signin {
+            max-width: 380px;
+            padding: 15px 35px 45px;
+            margin: 0 auto;
+            background-color: #fff;
+            border: 1px solid rgba(0,0,0,0.1);  
+
+            .form-signin-heading,
+            .checkbox {
+                argin-bottom: 30px;
+            }
+
+            .checkbox {
+                font-weight: normal;
+            }
+
+            .form-control {
+                position: relative;
+                font-size: 16px;
+                height: auto;
+                padding: 10px;
+                @include box-sizing(border-box);
+
+                &:focus {
+                z-index: 2;
+                }
+            }
+
+            input[type="text"] {
+                margin-bottom: -1px;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+
+            input[type="password"] {
+                margin-bottom: 20px;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <form class="form-signin" action="javascript:void(0)">       
+          <h4 class="form-signin-heading">로그인</h4>
+          <input type="text" class="form-control" id="id" placeholder="ID"  autofocus="" />
+          <input type="password" class="form-control" id="password" placeholder="Password" />      
+          <br>
+          <button onclick="sendReqeust()" class="btn btn-lg btn-primary btn-block" type="submit">Login</button>   
+          <a href="https://pj-login-bucket.s3.ap-northeast-2.amazonaws.com/createAC.html">회원가입</a>
+        </form>
+      </div>
+</body>
+
+<script type="text/javascript">
+    var id = document.querySelector('#id');
+    var password = document.querySelector('#password');
+    
+
+    function sendReqeust() {
+        console.log('hi')
+        //로그인 람다 함수 API 게이트웨이로 전송
+        fetch("https://cpaux28m24.execute-api.ap-northeast-2.amazonaws.com/default/pj-login-lambda", {
+            method: "POST",
+            body: JSON.stringify({
+                id : id.value,
+                password: password.value
+            })
+        }).then(function (response) {
+            return response.text().then(function (text) {
+                if (response.ok) {
+                    // 로그인 성공
+                    alert("로그인 성공");
+                    //메인페이지로 이동하기
+                    window.location.href = "http://pj-main-bucket.s3-website.ap-northeast-2.amazonaws.com"; 
+                } else {
+                    // 비밀번호 불일치, 존재하지 않는 회원, 조회 중 오류 발생
+                    alert(text);
+                }
+            });
+        }).catch(function (error) {
+            // 네트워크 오류 등으로 인한 요청 실패
+            alert("서버에 연결할 수 없습니다. 다시 시도해주세요.");
+        });
+    }
+</script>
+
+</html>
